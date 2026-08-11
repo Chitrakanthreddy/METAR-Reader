@@ -68,6 +68,7 @@ class TestDecodeWxString:
             ("VCSH", ["nearby showers of"]),
             ("FZFG", ["freezing fog"]),
             ("-RA BR", ["light rain", "mist"]),
+            ("XX", ["XX"]),  # unrecognized code passed through verbatim
         ],
     )
     def test_decodes_expected_phrases(self, wx_string, expected):
@@ -101,6 +102,10 @@ class TestDescribeSky:
     def test_formats_large_base_with_thousands_separator(self):
         clouds = [{"cover": "OVC", "base": 500}]
         assert describe_sky(clouds, "OVC") == "overcast skies at 500 ft"
+
+    def test_layer_without_base_omits_altitude(self):
+        clouds = [{"cover": "SCT"}]
+        assert describe_sky(clouds, "SCT") == "scattered clouds"
 
 
 class TestDescribeVisibility:

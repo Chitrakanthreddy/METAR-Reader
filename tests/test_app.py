@@ -66,6 +66,19 @@ def test_unrecognized_airport_code_shows_not_found_message(client, mock_metar_ap
     assert "No METAR data found for &#39;ZZZZ&#39;" in body
 
 
+def test_empty_json_list_body_shows_not_found_message(client, mock_metar_api):
+    # Distinct from the empty-body (204) case: here the API responds 200
+    # with a JSON body of "[]", which fetch_metar() must also treat as
+    # "no data found" rather than crashing on data[0].
+    mock_metar_api(empty_list=True)
+
+    response = client.get("/?airport=ZZZZ")
+    body = response.data.decode()
+
+    assert response.status_code == 200
+    assert "No METAR data found for &#39;ZZZZ&#39;" in body
+
+
 def test_malformed_airport_code_is_rejected_without_calling_api(client, mock_metar_api):
     calls = mock_metar_api()  # would raise if actually called with a bad code
 

@@ -104,6 +104,15 @@ Tests are split into two files:
   `mock_metar_api` fixture in `conftest.py`), so the suite runs offline
   and deterministically.
 
+To check test coverage:
+
+```bash
+pytest --cov=app --cov=metar_decoder --cov-report=term-missing
+```
+
+`.coveragerc` excludes the `if __name__ == "__main__":` dev-server
+startup line, which never runs under test.
+
 ## Airport codes
 
 The app looks up airports by their 4-letter ICAO identifier, e.g. `KJFK`

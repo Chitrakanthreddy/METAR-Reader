@@ -47,6 +47,7 @@ def mock_metar_api(monkeypatch):
 
         mock_metar_api(observation=some_dict)          # a normal reading
         mock_metar_api(not_found=True)                 # empty body (204)
+        mock_metar_api(empty_list=True)                # body is "[]"
         mock_metar_api(raise_exc=requests.exceptions.Timeout())
 
     The configurator returns the list of `params` dicts the fake `get`
@@ -55,13 +56,17 @@ def mock_metar_api(monkeypatch):
 
     calls = []
 
-    def _configure(observation=None, not_found=False, raise_exc=None):
+    def _configure(observation=None, not_found=False, empty_list=False, raise_exc=None):
         import json
 
         def fake_get(url, params=None, timeout=None):
             calls.append(params)
             if raise_exc is not None:
                 raise raise_exc
+            if empty_list:
+                # A 200 response whose JSON body is an empty list, as
+                # opposed to an empty body outright (see not_found below).
+                return FakeResponse(text="[]", status_code=200)
             if not_found or observation is None:
                 # Mirrors the real API's behavior for an unknown/inactive
                 # station: HTTP 200/204 with an empty body.
