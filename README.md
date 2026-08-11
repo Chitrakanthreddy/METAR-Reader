@@ -27,7 +27,12 @@ METAR-Reader/
 │   └── index.html        # Search form + results page
 ├── static/
 │   └── style.css          # Page styling
-└── requirements.txt
+├── tests/
+│   ├── test_app.py        # Route tests (network mocked out)
+│   └── test_metar_decoder.py  # Decoding logic tests
+├── conftest.py            # Shared pytest fixtures and mock METAR data
+├── requirements.txt
+└── requirements-dev.txt
 ```
 
 ## Requirements
@@ -74,6 +79,30 @@ code (e.g. `KJFK`, `KLAX`, `EGLL`).
 > pip install gunicorn
 > gunicorn app:app
 > ```
+
+## Running tests
+
+Install the dev dependencies (this also installs `requirements.txt`):
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Then run the test suite with [pytest](https://docs.pytest.org/):
+
+```bash
+pytest -v
+```
+
+Tests are split into two files:
+
+- `tests/test_metar_decoder.py` — unit tests for the decoding logic
+  (unit conversions, wind/sky/visibility phrasing, full METAR-to-summary
+  decoding), using hand-built mock observations.
+- `tests/test_app.py` — tests for the Flask routes, using mock METAR
+  readings in place of the real aviationweather.gov API (via the
+  `mock_metar_api` fixture in `conftest.py`), so the suite runs offline
+  and deterministically.
 
 ## Airport codes
 
