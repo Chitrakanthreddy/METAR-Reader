@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>METAR Reader</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <h1>METAR Reader</h1>
+    <p class="subtitle">Type an airport code to get a plain-English weather report.</p>
+
+    <form action="/" method="get" class="search-form">
+      <input
+        type="text"
+        name="airport"
+        placeholder="e.g. KJFK"
+        value="{{ airport_code or '' }}"
+        maxlength="4"
+        autocapitalize="characters"
+        autocomplete="off"
+        autofocus
+      >
+      <button type="submit">Get Weather</button>
+    </form>
+
+    {% if error %}
+      <div class="card error">
+        <p>{{ error }}</p>
+      </div>
+    {% endif %}
+
+    {% if result %}
+      <div class="card result">
+        <h2>{{ result.station_name }}</h2>
+        <p class="summary">{{ result.summary }}</p>
+
+        <dl class="details">
+          <div>
+            <dt>Temperature</dt>
+            <dd>{{ result.temperature_f }}°F ({{ result.temperature_c }}°C)</dd>
+          </div>
+          {% if result.dewpoint_f is not none %}
+          <div>
+            <dt>Dew Point</dt>
+            <dd>{{ result.dewpoint_f }}°F</dd>
+          </div>
+          {% endif %}
+          <div>
+            <dt>Wind</dt>
+            <dd>{{ result.wind | sentence_case }}</dd>
+          </div>
+          <div>
+            <dt>Sky</dt>
+            <dd>{{ result.sky | sentence_case }}</dd>
+          </div>
+          {% if result.weather %}
+          <div>
+            <dt>Weather</dt>
+            <dd>{{ result.weather | sentence_case }}</dd>
+          </div>
+          {% endif %}
+          {% if result.visibility %}
+          <div>
+            <dt>Visibility</dt>
+            <dd>{{ result.visibility | sentence_case }}</dd>
+          </div>
+          {% endif %}
+          {% if result.altimeter_inhg %}
+          <div>
+            <dt>Altimeter</dt>
+            <dd>{{ result.altimeter_inhg }} inHg</dd>
+          </div>
+          {% endif %}
+          {% if result.flight_category_text %}
+          <div>
+            <dt>Flying Conditions</dt>
+            <dd>{{ result.flight_category }} &mdash; {{ result.flight_category_text }}</dd>
+          </div>
+          {% endif %}
+        </dl>
+
+        <p class="raw"><code>{{ result.raw_metar }}</code></p>
+      </div>
+    {% endif %}
+  </main>
+</body>
+</html>
